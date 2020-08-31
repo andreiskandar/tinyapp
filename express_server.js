@@ -32,6 +32,11 @@ app.get('/hello', (req, res) => {
 	// res.send('<html><body>Hello <b>World</body></html>\n');
 });
 
+app.get('/urls/:shortURL', (req, res) => {
+	let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+	res.render('urls_show', templateVars);
+});
+
 // app.get('/set', (req, res) => {
 // 	const a = 1;
 // 	res.send(`a = ${a}`);
