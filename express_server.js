@@ -1,5 +1,5 @@
 const express = require('express');
-const ejs = require('ejs');
+// const ejs = require('ejs');
 const app = express();
 
 const PORT = 8080;
@@ -22,11 +22,14 @@ app.get('/urls.json', (req, res) => {
 app.get('/urls', (req, res) => {
 	let templateVars = { urls: urlDatabase };
 
-	res.render('urls_index', templateVars);
+	//res.render('fileName in views folder', {object})
+	res.render('urls_index', templateVars); // second argument takes on object
 });
 
 app.get('/hello', (req, res) => {
-	res.send('<html><body>Hello <b>World</body></html>\n');
+	let templateVars = { greeting: 'Hello World!' };
+	res.render('hello_world', templateVars);
+	// res.send('<html><body>Hello <b>World</body></html>\n');
 });
 
 // app.get('/set', (req, res) => {
