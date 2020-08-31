@@ -54,6 +54,19 @@ app.post('/urls', (req, res) => {
 	console.log(urlDatabase);
 	// res.send('Ok');
 });
+
+app.post('/urls/:shortURL/delete', (req, res) => {
+	console.log('entry was deleted');
+	const shortURL = req.params.shortURL;
+
+	delete urlDatabase[shortURL];
+	res.redirect('/urls');
+});
+
+app.get('/u/:shortURL', (req, res) => {
+	const longURL = urlDatabase[req.params.shortURL];
+	res.redirect(longURL);
+});
 // app.get('/set', (req, res) => {
 // 	const a = 1;
 // 	res.send(`a = ${a}`);
