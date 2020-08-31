@@ -29,7 +29,10 @@ app.get('/urls', (req, res) => {
 app.get('/hello', (req, res) => {
 	let templateVars = { greeting: 'Hello World!' };
 	res.render('hello_world', templateVars);
-	// res.send('<html><body>Hello <b>World</body></html>\n');
+});
+
+app.get('/urls/new', (req, res) => {
+	res.render('urls_new');
 });
 
 app.get('/urls/:shortURL', (req, res) => {
