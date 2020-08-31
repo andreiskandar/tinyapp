@@ -1,9 +1,17 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const alphanumeric = require('alphanumeric-id');
+
 // const ejs = require('ejs');
 const app = express();
 
 const PORT = 8080;
 
+const generateRandomString = () => {
+	return alphanumeric(6);
+};
+
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
@@ -40,6 +48,12 @@ app.get('/urls/:shortURL', (req, res) => {
 	res.render('urls_show', templateVars);
 });
 
+app.post('/urls', (req, res) => {
+	const shortURL = generateRandomString();
+	urlDatabase[shortURL] = req.body.longURL;
+	console.log(urlDatabase);
+	// res.send('Ok');
+});
 // app.get('/set', (req, res) => {
 // 	const a = 1;
 // 	res.send(`a = ${a}`);
