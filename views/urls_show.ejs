@@ -20,7 +20,18 @@
 				<h5 class="card-title">TinyURL for: <%= longURL %></h5>
 				<p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
 			</div>
-			<div class="card-footer text-muted"></div>
+			<div class="card-footer text-muted">
+				<h2>Edit</h2>
+<form method='POST' action="/urls/<%= shortURL %>">
+	<h5>
+		New URL:<span> </span>
+			<input name="newLongURLinputText" type="text" placeholder="http://www.tsn.ca"/><span> </span
+			><button class="btn btn-primary">Submit</button>
+		</span>
+	</h5>
+
+</form>
+			</div>
 		</div>
 		<!-- Bootstrap JS -->
 		<script

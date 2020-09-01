@@ -63,8 +63,18 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 	res.redirect('/urls');
 });
 
+app.post('/urls/:shortURL', (req, res) => {
+	// get the input from text input
+	const longURL = req.body.newLongURLinputText;
+	urlDatabase[req.params.shortURL] = req.body.newLongURLinputText;
+	console.log('urlDatabase:', urlDatabase);
+	console.log('entry was updated');
+	res.redirect('/urls');
+});
+
 app.get('/u/:shortURL', (req, res) => {
 	const longURL = urlDatabase[req.params.shortURL];
+	console.log('longURL:', longURL);
 	res.redirect(longURL);
 });
 // app.get('/set', (req, res) => {
