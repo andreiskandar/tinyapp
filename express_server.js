@@ -5,7 +5,8 @@ const alphanumeric = require('alphanumeric-id');
 
 // const ejs = require('ejs');
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const PORT = 8080;
@@ -25,9 +26,10 @@ app.get('/', (req, res) => {
 	console.log(`Cookies: ${req.cookies}`);
 });
 
-app.get('/urls.json', (req, res) => {
-	res.send(urlDatabase);
-});
+// To be removed
+// app.get('/urls.json', (req, res) => {
+// 	res.send(urlDatabase);
+// });
 
 app.get('/urls', (req, res) => {
 	console.log('req.cookies :', req.cookies);
@@ -43,7 +45,8 @@ app.get('/hello', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-	res.render('urls_new');
+	let templateVars = { username: req.cookies.username };
+	res.render('urls_new', templateVars);
 });
 
 app.post('/urls/login', (req, res) => {
@@ -53,14 +56,19 @@ app.post('/urls/login', (req, res) => {
 	res.redirect('/urls');
 });
 
-// app.post('/login', (req, res) => {
-// 	let templateVars = { urls: urlDatabase /*username: req.cookies['username']*/ };
+app.post('/urls/logout', (req, res) => {
+	// res.clearCookie()
+	res.cookie('username', '');
 
-// 	res.render('urls_index', templateVars);
-// });
+	res.redirect('/urls');
+});
 
 app.get('/urls/:shortURL', (req, res) => {
-	let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+	let templateVars = {
+		shortURL: req.params.shortURL,
+		longURL: urlDatabase[req.params.shortURL],
+		username: req.cookies.username,
+	};
 	res.render('urls_show', templateVars);
 });
 
