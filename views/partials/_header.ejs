@@ -17,6 +17,21 @@
 				<a class="nav-item nav-link" href="/urls">My URLs</a>
 				<a class="nav-item nav-link" href="/urls/new">Create New URL</a>
 			</div>
+			<% if(username) { %>
+					<form class="form-inline ml-auto" action="/urls/login" method="POST">
+						<p>Logged In As: <%= username %></p>
+						<button type="submit" class="btn btn-outline-dark my-2 my-sm-0"">Logout</button>
+				</form>
+				<% } else { %>
+					<form class="form-inline ml-auto" action="/urls/login" method="POST">
+						<input type="text" class="form-control mr-sm-2" name="username" placeholder="Username" />
+						<button type="submit" class="btn btn-outline-dark my-2 my-sm-0"">Login</button>
+					</form>
+			<% } %>
+
+
 		</div>
 	</nav>
 </header>
+
+

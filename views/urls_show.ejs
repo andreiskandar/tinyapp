@@ -21,16 +21,17 @@
 				<p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
 			</div>
 			<div class="card-footer text-muted">
-				<h2>Edit</h2>
-<form method='POST' action="/urls/<%= shortURL %>">
-	<h5>
-		New URL:<span> </span>
-			<input name="newLongURLinputText" type="text" placeholder="http://www.tsn.ca"/><span> </span
-			><button class="btn btn-primary">Submit</button>
-		</span>
-	</h5>
-
-</form>
+				<h3>Edit</h3>
+				<form method="POST" action="/urls/<%= shortURL %>">
+					<label>New URL: </label>
+					<input
+						name="newLongURLinputText"
+						type="text"
+						placeholder="http://www.tsn.ca"
+						style="width: 300px; margin: 1em"
+					/>
+					<button class="btn btn-primary">Submit</button>
+				</form>
 			</div>
 		</div>
 		<!-- Bootstrap JS -->
