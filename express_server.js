@@ -32,6 +32,11 @@ const generateRandomString = () => {
 	return alphanumeric(6);
 };
 
+const checkEmailDBLookup = (newEmail) => {
+	const emailDB = Object.keys(users).map((id) => users[id].email);
+	return emailDB.includes(newEmail);
+};
+
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
@@ -63,30 +68,29 @@ app.post('/register', (req, res) => {
 	let id = generateNewID();
 	if (users.hasOwnProperty(id)) id = generateNewID();
 	const { email, password } = req.body;
-	const templateVars = {
+	let templateVars = {
 		statusCode: 400,
 		user_id: req.cookies.email,
 	};
-	console.log('templateVars:', templateVars);
 	// what happens if you try to register without an email or a password?
 	if (!email || !password) {
-		templateVars[message] = 'Bad Request, Please enter email or password';
+		templateVars['message'] = 'Bad Request, Please enter email or password';
 
 		res.status(400);
 		res.render('urls_error', templateVars);
 	}
 	// check if email already exist - enter new email
-	for (const id in users) {
-		console.log(id);
-		if (email === users[id].email) {
-			templateVars[message] = 'Bad Request. Email already exists. Please enter new email address';
-			console.log(templateVars);
-			res.status(400);
-			// res.send('Bad Request');
-			res.render('urls_error', templateVars);
-			res.redirect('/register');
-		}
+	// for (const id in users) {
+	// 	console.log(id);
+	if (checkEmailDBLookup(email)) {
+		// if (email === users[id].email) {
+		templateVars['message'] = 'Bad Request. Email already exists. Please enter new email address';
+		console.log(templateVars);
+		res.status(400);
+		// res.send('Bad Request');
+		res.render('urls_error', templateVars);
 	}
+	// }
 	users[id] = { id, email, password };
 	console.log(JSON.stringify(users));
 	res.cookie('user_id', email);
