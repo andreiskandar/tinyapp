@@ -27,9 +27,9 @@ const users = {
 
 const ERROR_MESSAGE = {
 	no_email_and_password: 'Please enter email or password',
-	duplicate_email: 'There is an issue with email or password',
+	issue_with_email_password: 'There is an issue with email or password',
+	account_does_exist: 'Account does not exist. Please sign up new account',
 };
-// console.log(ERROR_MESSAGE.duplicate_email);
 
 const generateNewID = () => {
 	return uuid().split('-')[1];
@@ -42,6 +42,13 @@ const generateRandomString = () => {
 const doesNewEmailExist = (newEmail) => {
 	const emailDB = Object.keys(users).map((id) => users[id].email);
 	return emailDB.includes(newEmail);
+};
+
+const validatePassword = (userEmail, userPassword) => {
+	for (const id in users) {
+		return users[id].email === userEmail && users[id].password === userPassword;
+	}
+	return false;
 };
 
 app.set('view engine', 'ejs');
@@ -96,7 +103,7 @@ app.post('/register', (req, res) => {
 	else if (doesNewEmailExist(email)) {
 		const templateVars = {
 			user_id: '',
-			message: ERROR_MESSAGE.duplicate_email,
+			message: ERROR_MESSAGE.issue_with_email_password,
 			error: true,
 		};
 		res.cookie('error', true);
@@ -121,19 +128,34 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
 	// res.cookie('username', req.body.username);
 	const { email, password } = req.body;
-	let templateVars = {
-		statusCode: 403,
-		user_id: req.cookies.email,
-	};
-	if (!doesNewEmailExist(email)) {
-		templateVars.message = 'Account does not exist. Please sign up new account';
-		res.status(403);
-		res.render('urls_error', templateVars);
-	}
-	e;
 
-	res.cookie('user_id', email);
-	res.redirect('/urls');
+	if (!email || !password) {
+		const templateVars = {
+			user_id: '',
+			message: ERROR_MESSAGE.no_email_and_password,
+			error: true,
+		};
+		res.cookie('error', true);
+		res.cookie('message', ERROR_MESSAGE.no_email_and_password);
+		res.cookie('user_id', '');
+		res.status(403);
+		return res.render('urls_login', templateVars);
+	} else if (doesNewEmailExist(email) && !validatePassword(email, password)) {
+		const templateVars = {
+			user_id: '',
+			message: ERROR_MESSAGE.issue_with_email_password,
+			error: true,
+		};
+
+		res.cookie('error', true);
+		res.cookie('message', ERROR_MESSAGE.issue_with_email_password);
+		res.cookie('user_id', '');
+		res.status(403);
+		return res.render('urls_login', templateVars);
+	} else {
+		res.cookie('user_id', email);
+		res.redirect('/urls');
+	}
 });
 
 app.post('/urls/logout', (req, res) => {

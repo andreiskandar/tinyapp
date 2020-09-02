@@ -42,9 +42,13 @@
 					/>
 				</div>
 				<button type="submit" class="btn btn-primary">Login</button>
+
+				<% if(error) { %>
+				<br />
+				<br />
+				<div class="alert alert-danger" style="width: 300px" role="alert"><%= message %></div>
+				<% } %>
 			</form>
-			<br />
-			<div class="alert alert-danger" style="width: 300px" role="alert"><%= errorMessage %></div>
 		</main>
 		<!-- Bootstrap JS -->
 		<script
