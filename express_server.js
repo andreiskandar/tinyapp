@@ -26,9 +26,9 @@ const users = {
 };
 
 const ERROR_MESSAGE = {
-	no_email_and_password: 'Please enter email or password',
-	issue_with_email_password: 'There is an issue with email or password',
-	account_does_exist: 'Account does not exist. Please sign up new account',
+	no_email_and_password: 'Please enter an email or password',
+	issue_with_email_password: 'There is an issue with the email or password',
+	account_does_not_exist: 'Account does not exist. Please register a new account',
 };
 
 const generateNewID = () => {
@@ -92,9 +92,9 @@ app.post('/register', (req, res) => {
 			message: ERROR_MESSAGE.no_email_and_password,
 			error: true,
 		};
-		res.cookie('error', true);
-		res.cookie('message', ERROR_MESSAGE.no_email_and_password);
-		res.cookie('user_id', ''); //check with mentor?
+		// res.cookie('error', true);
+		// res.cookie('message', ERROR_MESSAGE.no_email_and_password);
+		// res.cookie('user_id', ''); //check with mentor?
 		res.status(400);
 		return res.render('urls_register', templateVars);
 	}
@@ -106,9 +106,9 @@ app.post('/register', (req, res) => {
 			message: ERROR_MESSAGE.issue_with_email_password,
 			error: true,
 		};
-		res.cookie('error', true);
-		res.cookie('message', ERROR_MESSAGE.no_email_and_password);
-		res.cookie('user_id', '');
+		// res.cookie('error', true);
+		// res.cookie('message', ERROR_MESSAGE.no_email_and_password);
+		// res.cookie('user_id', '');
 		res.status(400);
 		return res.render('urls_register', templateVars); // render or redirect???
 	} else {
@@ -135,9 +135,17 @@ app.post('/login', (req, res) => {
 			message: ERROR_MESSAGE.no_email_and_password,
 			error: true,
 		};
-		res.cookie('error', true);
-		res.cookie('message', ERROR_MESSAGE.no_email_and_password);
-		res.cookie('user_id', '');
+		// res.cookie('error', true);
+		// res.cookie('message', ERROR_MESSAGE.no_email_and_password);
+		// res.cookie('user_id', '');
+		res.status(403);
+		return res.render('urls_login', templateVars);
+	} else if (!doesNewEmailExist(email)) {
+		const templateVars = {
+			user_id: '',
+			message: ERROR_MESSAGE.account_does_not_exist,
+			error: true,
+		};
 		res.status(403);
 		return res.render('urls_login', templateVars);
 	} else if (doesNewEmailExist(email) && !validatePassword(email, password)) {
@@ -147,9 +155,9 @@ app.post('/login', (req, res) => {
 			error: true,
 		};
 
-		res.cookie('error', true);
-		res.cookie('message', ERROR_MESSAGE.issue_with_email_password);
-		res.cookie('user_id', '');
+		// res.cookie('error', true);
+		// res.cookie('message', ERROR_MESSAGE.issue_with_email_password);
+		// res.cookie('user_id', '');
 		res.status(403);
 		return res.render('urls_login', templateVars);
 	} else {
@@ -219,6 +227,3 @@ In fact, 'a' is not defined in this scope, and will result in a reference error 
 app.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}!`);
 });
-
-// <br />
-// <div class="alert alert-danger" style="width: 300px" role="alert"><%= message %></div>
