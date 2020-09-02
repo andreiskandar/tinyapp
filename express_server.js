@@ -11,6 +11,12 @@ app.use(cookieParser());
 
 const PORT = 8080;
 
+const usersDB = {};
+
+const generateNewID = () => {
+	return alphanumeric(2);
+};
+
 const generateRandomString = () => {
 	return alphanumeric(6);
 };
@@ -22,9 +28,7 @@ const urlDatabase = {
 	'9sm5xK': 'http://www.google.com',
 };
 
-app.get('/', (req, res) => {
-	console.log(`Cookies: ${req.cookies}`);
-});
+app.get('/', (req, res) => {});
 
 // To be removed
 // app.get('/urls.json', (req, res) => {
@@ -47,6 +51,18 @@ app.get('/urls/new', (req, res) => {
 app.get('/register', (req, res) => {
 	const templateVars = { username: req.cookies.username };
 	res.render('urls_register', templateVars);
+});
+
+app.post('/register', (req, res) => {
+	const id = generateNewID();
+	const { email, password } = req.body;
+	for (const idFromDB in usersDB) {
+		if (id === idFromDB) {
+			id = generateNewID();
+		}
+	}
+	usersDB[id] = { id, email, password };
+	console.log(JSON.stringify(usersDB));
 });
 
 app.post('/urls/login', (req, res) => {
