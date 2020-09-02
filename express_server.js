@@ -2,14 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const alphanumeric = require('alphanumeric-id');
+const uuid = require('uuid').v4;
 
 // const ejs = require('ejs');
 const app = express();
-app.use(express.urlencoded({ extended: false }));
-// app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-
 const PORT = 8080;
+
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 const users = {
 	userRandomID: {
@@ -24,15 +25,21 @@ const users = {
 	},
 };
 
+const ERROR_MESSAGE = {
+	no_email_and_password: 'Please enter email or password',
+	duplicate_email: 'There is an issue with email or password',
+};
+// console.log(ERROR_MESSAGE.duplicate_email);
+
 const generateNewID = () => {
-	return alphanumeric(2);
+	return uuid().split('-')[1];
 };
 
 const generateRandomString = () => {
 	return alphanumeric(6);
 };
 
-const checkEmailDBLookup = (newEmail) => {
+const doesNewEmailExist = (newEmail) => {
 	const emailDB = Object.keys(users).map((id) => users[id].email);
 	return emailDB.includes(newEmail);
 };
@@ -47,7 +54,7 @@ const urlDatabase = {
 app.get('/', (req, res) => {});
 
 app.get('/urls', (req, res) => {
-	console.log('req.cookies :', req.cookies);
+	// console.log('req.cookies :', req.cookies);
 	let templateVars = { urls: urlDatabase, user_id: req.cookies.user_id };
 
 	//res.render('fileName in views folder', {object})
@@ -60,53 +67,72 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-	const templateVars = { user_id: req.cookies.user_id };
+	const templateVars = {
+		user_id: req.cookies.user_id,
+		error: false,
+	};
 	res.render('urls_register', templateVars);
 });
 
 app.post('/register', (req, res) => {
-	let id = generateNewID();
-	if (users.hasOwnProperty(id)) id = generateNewID();
+	const id = generateNewID(); // change to uuid --> require uuid.v4
 	const { email, password } = req.body;
-	let templateVars = {
-		statusCode: 400,
-		user_id: req.cookies.email,
-	};
+
 	// what happens if you try to register without an email or a password?
 	if (!email || !password) {
-		templateVars['message'] = 'Bad Request, Please enter email or password';
-
+		const templateVars = {
+			user_id: '',
+			message: ERROR_MESSAGE.no_email_and_password,
+			error: true,
+		};
+		res.cookie('error', true);
+		res.cookie('message', ERROR_MESSAGE.no_email_and_password);
+		res.cookie('user_id', ''); //check with mentor?
 		res.status(400);
-		res.render('urls_error', templateVars);
+		return res.render('urls_register', templateVars);
 	}
-	// check if email already exist - enter new email
-	// for (const id in users) {
-	// 	console.log(id);
-	if (checkEmailDBLookup(email)) {
-		// if (email === users[id].email) {
-		templateVars['message'] = 'Bad Request. Email already exists. Please enter new email address';
-		console.log(templateVars);
-		res.status(400);
-		// res.send('Bad Request');
-		res.render('urls_error', templateVars);
-	}
-	// }
-	users[id] = { id, email, password };
-	console.log(JSON.stringify(users));
-	res.cookie('user_id', email);
-	console.log('templateVars:', templateVars);
 
-	res.redirect('/urls');
+	// check if email already exist -error msg enter new email
+	else if (doesNewEmailExist(email)) {
+		const templateVars = {
+			user_id: '',
+			message: ERROR_MESSAGE.duplicate_email,
+			error: true,
+		};
+		res.cookie('error', true);
+		res.cookie('message', ERROR_MESSAGE.no_email_and_password);
+		res.cookie('user_id', '');
+		res.status(400);
+		return res.render('urls_register', templateVars); // render or redirect???
+	} else {
+		users[id] = { id, email, password };
+		console.log(users);
+		res.cookie('user_id', email);
+		res.redirect('/urls');
+	}
 });
 
 app.get('/login', (req, res) => {
-	const templateVars = { user_id: req.cookies.user_id };
+	const templateVars = { user_id: req.cookies.user_id, error: false };
+	console.log(users);
 	res.render('urls_login', templateVars);
 });
 
-app.post('/urls/login', (req, res) => {
+app.post('/login', (req, res) => {
 	// res.cookie('username', req.body.username);
+	const { email, password } = req.body;
+	let templateVars = {
+		statusCode: 403,
+		user_id: req.cookies.email,
+	};
+	if (!doesNewEmailExist(email)) {
+		templateVars.message = 'Account does not exist. Please sign up new account';
+		res.status(403);
+		res.render('urls_error', templateVars);
+	}
+	e;
 
+	res.cookie('user_id', email);
 	res.redirect('/urls');
 });
 
@@ -171,3 +197,6 @@ In fact, 'a' is not defined in this scope, and will result in a reference error 
 app.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}!`);
 });
+
+// <br />
+// <div class="alert alert-danger" style="width: 300px" role="alert"><%= message %></div>
