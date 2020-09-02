@@ -11,7 +11,18 @@ app.use(cookieParser());
 
 const PORT = 8080;
 
-const usersDB = {};
+const users = {
+	userRandomID: {
+		id: 'userRandomID',
+		email: 'user@example.com',
+		password: 'purple-monkey-dinosaur',
+	},
+	user2RandomID: {
+		id: 'user2RandomID',
+		email: 'user2@example.com',
+		password: 'dishwasher-funk',
+	},
+};
 
 const generateNewID = () => {
 	return alphanumeric(2);
@@ -30,52 +41,63 @@ const urlDatabase = {
 
 app.get('/', (req, res) => {});
 
-// To be removed
-// app.get('/urls.json', (req, res) => {
-// 	res.send(urlDatabase);
-// });
-
 app.get('/urls', (req, res) => {
 	console.log('req.cookies :', req.cookies);
-	let templateVars = { urls: urlDatabase, username: req.cookies.username };
+	let templateVars = { urls: urlDatabase, user_id: req.cookies.user_id };
 
 	//res.render('fileName in views folder', {object})
 	res.render('urls_index', templateVars); // second argument takes on object
 });
 
 app.get('/urls/new', (req, res) => {
-	let templateVars = { username: req.cookies.username };
+	let templateVars = { user_id: req.cookies.user_id };
 	res.render('urls_new', templateVars);
 });
 
 app.get('/register', (req, res) => {
-	const templateVars = { username: req.cookies.username };
+	const templateVars = { user_id: req.cookies.user_id };
 	res.render('urls_register', templateVars);
 });
 
 app.post('/register', (req, res) => {
 	let id = generateNewID();
-	if (usersDB.hasOwnProperty(id)) id = generateNewID();
+	if (users.hasOwnProperty(id)) id = generateNewID();
 	const { email, password } = req.body;
+	const templateVars = {
+		statusCode: 400,
+		user_id: req.cookies.email,
+	};
+	console.log('templateVars:', templateVars);
+	// what happens if you try to register without an email or a password?
+	if (!email || !password) {
+		templateVars[message] = 'Bad Request, Please enter email or password';
 
+		res.status(400);
+		res.render('urls_error', templateVars);
+	}
 	// check if email already exist - enter new email
-	for (const id in usersDB) {
+	for (const id in users) {
 		console.log(id);
-		if (email === usersDB[id].email) {
-			res.send("<script>alert('Email already exists. Please enter new email address')</script>");
+		if (email === users[id].email) {
+			templateVars[message] = 'Bad Request. Email already exists. Please enter new email address';
+			console.log(templateVars);
+			res.status(400);
+			// res.send('Bad Request');
+			res.render('urls_error', templateVars);
 			res.redirect('/register');
 		}
 	}
-	usersDB[id] = { id, email, password };
-	console.log(JSON.stringify(usersDB));
+	users[id] = { id, email, password };
+	console.log(JSON.stringify(users));
+	res.cookie('user_id', email);
+	console.log('templateVars:', templateVars);
 
-	// e. First, what happens if you try to register without an email or a password?
-	// if (!email || !password) {
-	// } else {
-	// }
-
-	res.cookie('username', email);
 	res.redirect('/urls');
+});
+
+app.get('/login', (req, res) => {
+	const templateVars = { user_id: req.cookies.user_id };
+	res.render('urls_login', templateVars);
 });
 
 app.post('/urls/login', (req, res) => {
@@ -85,8 +107,9 @@ app.post('/urls/login', (req, res) => {
 });
 
 app.post('/urls/logout', (req, res) => {
-	// res.clearCookie('username');   another way to clear cookie
-	res.cookie('username', '');
+	// another way to clear cookie
+	// res.clearCookie('user_id');
+	res.cookie('user_id', '');
 
 	res.redirect('/urls');
 });
@@ -95,7 +118,7 @@ app.get('/urls/:shortURL', (req, res) => {
 	let templateVars = {
 		shortURL: req.params.shortURL,
 		longURL: urlDatabase[req.params.shortURL],
-		username: req.cookies.username,
+		username: req.cookies.user_id,
 	};
 	res.render('urls_show', templateVars);
 });
