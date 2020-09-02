@@ -54,26 +54,25 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-	const id = generateNewID();
+	let id = generateNewID();
+	if (usersDB.hasOwnProperty(id)) id = generateNewID();
+
 	const { email, password } = req.body;
-	for (const idFromDB in usersDB) {
-		if (id === idFromDB) {
-			id = generateNewID();
-		}
-	}
+
 	usersDB[id] = { id, email, password };
+	res.cookie('username', email);
 	console.log(JSON.stringify(usersDB));
+	res.redirect('/urls');
 });
 
 app.post('/urls/login', (req, res) => {
-	res.cookie('username', req.body.username);
-	console.log(`res.cookies: ${res.cookie}`);
+	// res.cookie('username', req.body.username);
 
 	res.redirect('/urls');
 });
 
 app.post('/urls/logout', (req, res) => {
-	// res.clearCookie()
+	// res.clearCookie();
 	res.cookie('username', '');
 
 	res.redirect('/urls');
