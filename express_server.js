@@ -56,12 +56,25 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
 	let id = generateNewID();
 	if (usersDB.hasOwnProperty(id)) id = generateNewID();
-
 	const { email, password } = req.body;
 
+	// check if email already exist - enter new email
+	for (const id in usersDB) {
+		console.log(id);
+		if (email === usersDB[id].email) {
+			res.send("<script>alert('Email already exists. Please enter new email address')</script>");
+			res.redirect('/register');
+		}
+	}
 	usersDB[id] = { id, email, password };
-	res.cookie('username', email);
 	console.log(JSON.stringify(usersDB));
+
+	// e. First, what happens if you try to register without an email or a password?
+	// if (!email || !password) {
+	// } else {
+	// }
+
+	res.cookie('username', email);
 	res.redirect('/urls');
 });
 
@@ -72,7 +85,7 @@ app.post('/urls/login', (req, res) => {
 });
 
 app.post('/urls/logout', (req, res) => {
-	// res.clearCookie();
+	// res.clearCookie('username');   another way to clear cookie
 	res.cookie('username', '');
 
 	res.redirect('/urls');
