@@ -39,14 +39,14 @@ app.get('/urls', (req, res) => {
 	res.render('urls_index', templateVars); // second argument takes on object
 });
 
-app.get('/hello', (req, res) => {
-	let templateVars = { greeting: 'Hello World!' };
-	res.render('hello_world', templateVars);
-});
-
 app.get('/urls/new', (req, res) => {
 	let templateVars = { username: req.cookies.username };
 	res.render('urls_new', templateVars);
+});
+
+app.get('/register', (req, res) => {
+	const templateVars = { username: req.cookies.username };
+	res.render('urls_register', templateVars);
 });
 
 app.post('/urls/login', (req, res) => {
