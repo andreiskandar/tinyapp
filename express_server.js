@@ -12,6 +12,8 @@ const PORT = 8080;
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.set('view engine', 'ejs');
+
 const users = {
 	userRandomID: {
 		id: 'userRandomID',
@@ -31,6 +33,11 @@ const ERROR_MESSAGE = {
 	account_does_not_exist: 'Account does not exist. Please register a new account',
 };
 
+const urlDatabase = {
+	b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'aJ48lW' },
+	i3BoGr: { longURL: 'https://www.google.ca', userID: 'aJ48lW' },
+};
+
 const generateNewID = () => {
 	return uuid().split('-')[1];
 };
@@ -46,22 +53,16 @@ const doesNewEmailExist = (newEmail) => {
 
 const validatePassword = (userEmail, userPassword) => {
 	for (const id in users) {
-		return users[id].email === userEmail && users[id].password === userPassword;
+		if (users[id].email === userEmail && users[id].password === userPassword) {
+			return true;
+		}
 	}
 	return false;
-};
-
-app.set('view engine', 'ejs');
-
-const urlDatabase = {
-	b2xVn2: 'http://www.lighthouselabs.ca',
-	'9sm5xK': 'http://www.google.com',
 };
 
 app.get('/', (req, res) => {});
 
 app.get('/urls', (req, res) => {
-	// console.log('req.cookies :', req.cookies);
 	let templateVars = { urls: urlDatabase, user_id: req.cookies.user_id };
 
 	//res.render('fileName in views folder', {object})
@@ -70,7 +71,11 @@ app.get('/urls', (req, res) => {
 
 app.get('/urls/new', (req, res) => {
 	let templateVars = { user_id: req.cookies.user_id };
-	res.render('urls_new', templateVars);
+	if (!req.cookies.user_id) {
+		res.redirect('/login');
+	} else {
+		res.render('urls_new', templateVars);
+	}
 });
 
 app.get('/register', (req, res) => {
@@ -121,7 +126,6 @@ app.post('/register', (req, res) => {
 
 app.get('/login', (req, res) => {
 	const templateVars = { user_id: req.cookies.user_id, error: false };
-	console.log(users);
 	res.render('urls_login', templateVars);
 });
 
@@ -177,17 +181,19 @@ app.post('/urls/logout', (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
 	let templateVars = {
 		shortURL: req.params.shortURL,
-		longURL: urlDatabase[req.params.shortURL],
-		username: req.cookies.user_id,
+		longURL: urlDatabase[req.params.shortURL].longURL,
+		user_id: req.cookies.user_id,
 	};
 	res.render('urls_show', templateVars);
 });
 
 app.post('/urls', (req, res) => {
 	const shortURL = generateRandomString();
-	urlDatabase[shortURL] = req.body.longURL;
-	console.log(urlDatabase);
-	// res.send('Ok');
+
+	urlDatabase[shortURL] = {
+		longURL: req.body.longURL,
+		userID: req.cookies.user_id,
+	};
 	res.redirect('/urls');
 });
 
@@ -202,14 +208,14 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 app.post('/urls/:shortURL', (req, res) => {
 	// get the input from text input
 	const longURL = req.body.newLongURLinputText;
-	urlDatabase[req.params.shortURL] = req.body.newLongURLinputText;
+	urlDatabase[req.params.shortURL].longURL = req.body.newLongURLinputText;
 	console.log('urlDatabase:', urlDatabase);
 	console.log('entry was updated');
 	res.redirect('/urls');
 });
 
 app.get('/u/:shortURL', (req, res) => {
-	const longURL = urlDatabase[req.params.shortURL];
+	const longURL = urlDatabase[req.params.shortURL].longURL;
 	res.redirect(longURL);
 });
 // app.get('/set', (req, res) => {
