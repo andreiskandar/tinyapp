@@ -19,7 +19,9 @@
 			</div>
 			<% if(user_id) { %>
 			<form class="form-inline ml-auto" action="/urls/logout" method="POST">
-				<h5 style="margin: 2px 4px 0 0; padding-right: 5px">Logged In As: <%= user_id %>!</h5>
+				<h6 style="margin: 2px 4px 0 0; padding-right: 5px; color: #ffffff"; font-family:-apple-system;">
+					Logged In As: <%= user_id %>!
+				</h6>
 				<button type="submit" class="btn btn-outline-dark my-2 my-sm-0">Logout</button>
 			</form>
 			<% } else { %>

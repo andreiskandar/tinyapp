@@ -17,38 +17,43 @@
 
 	<body>
 		<%- include('partials/_header') %>
-
 		<main style="margin: 1em">
-			<h3>Create Account</h3>
-			<form action="/register" method="POST">
-				<div class="form-group">
-					<label for="email">Email address</label>
-					<input
-						class="form-control"
-						type="email"
-						name="email"
-						placeholder="email@address.com"
-						style="width: 300px"
-					/>
+			<div class="card text-center">
+				<div class="card-header">
+					<h3>Create Account</h3>
 				</div>
-				<div class="form-group">
-					<label for="password">Password</label>
-					<input
-						class="form-control"
-						type="password"
-						name="password"
-						placeholder="password"
-						style="width: 300px"
-					/>
+				<div class="card-body">
+					<form action="/register" method="POST">
+						<div class="form-group">
+							<input
+								style="align-content: center; width: 300px; margin: auto"
+								class="form-control"
+								type="email"
+								name="email"
+								placeholder="Email"
+							/>
+						</div>
+						<div class="form-group">
+							<input
+								style="align-content: center; width: 300px; margin: auto"
+								class="form-control"
+								type="password"
+								name="password"
+								placeholder="Password"
+								style="width: 300px"
+							/>
+						</div>
 				</div>
-				<button type="submit" class="btn btn-primary">Register</button>
-
-				<% if(error) { %>
-				<br />
-				<br />
-				<div class="alert alert-danger" style="width: 300px" role="alert"><%= message %></div>
-				<% } %>
-			</form>
+					<div class="card-footer">
+						<button type="submit" class="btn btn-primary" style="width: 300px">Register</button>
+						<% if(error) { %>
+						<br />
+						<br />
+						<div class="alert alert-danger" style="margin:auto; width: 300px" role="alert"><%= message %></div>
+						<% } %>
+					</div>
+				</form>
+			</div>
 		</main>
 		<!-- Bootstrap JS -->
 		<script
