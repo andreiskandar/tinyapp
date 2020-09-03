@@ -14,6 +14,12 @@ const PORT = 8080;
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(
+	cookieSession({
+		name: 'session',
+		keys: ['secretkey'],
+	})
+);
 
 app.set('view engine', 'ejs');
 
@@ -46,6 +52,7 @@ const urlDatabase = {
 	i3BodsGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
 };
 
+//==============================================================================================
 const generateNewID = () => {
 	return uuid().split('-')[1];
 };
@@ -78,18 +85,20 @@ const getUserURLDatabase = (email) => {
 	}
 	return userURLObj;
 };
-
+//==============================================================================================
 app.get('/urls', (req, res) => {
-	const user_id = req.cookies.user_id;
+	// const user_id = req.cookies.user_id;
+	const user_id = req.session.user_id;
 	const userURLDatabase = getUserURLDatabase(user_id);
 
-	let templateVars = { urls: userURLDatabase, user_id: req.cookies.user_id };
+	let templateVars = { urls: userURLDatabase, user_id: req.session.user_id };
 	res.render('urls_index', templateVars); // second argument takes on object
 });
 
 app.get('/urls/new', (req, res) => {
-	let templateVars = { user_id: req.cookies.user_id };
-	if (!req.cookies.user_id) {
+	let templateVars = { user_id: req.session.user_id };
+	// if (!req.cookies.user_id) {
+	if (!req.session.user_id) {
 		res.redirect('/login');
 	} else {
 		res.render('urls_new', templateVars);
@@ -98,11 +107,48 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/register', (req, res) => {
 	const templateVars = {
-		user_id: req.cookies.user_id,
+		// user_id: req.cookies.user_id,
+		user_id: req.session.user_id,
 		error: false,
 	};
 	res.render('urls_register', templateVars);
 });
+
+app.get('/login', (req, res) => {
+	// const templateVars = { user_id: req.cookies.user_id, error: false };
+	const templateVars = { user_id: req.session.user_id, error: false };
+
+	res.render('urls_login', templateVars);
+});
+
+app.get('/urls/:shortURL', (req, res) => {
+	// const user_id = req.cookies.user_id;
+	const user_id = req.session.user_id;
+	if (user_id) {
+		let templateVars = {
+			shortURL: req.params.shortURL,
+			longURL: urlDatabase[req.params.shortURL].longURL,
+			// user_id: req.cookies.user_id,
+			user_id: req.session.user_id,
+		};
+		res.render('urls_show', templateVars);
+	} else {
+		res.redirect('/urls');
+	}
+});
+
+app.get('/u/:shortURL', (req, res) => {
+	// const user_id = req.cookies.user_id;
+	const user_id = req.session.user_id;
+	if (user_id) {
+		const longURL = urlDatabase[req.params.shortURL].longURL;
+		res.redirect(longURL);
+	} else {
+		res.redirect('/urls');
+	}
+});
+
+//==============================================================================================
 
 app.post('/register', (req, res) => {
 	const id = generateNewID(); // change to uuid --> require uuid.v4
@@ -133,15 +179,10 @@ app.post('/register', (req, res) => {
 	} else {
 		password = bcrypt.hashSync(password, 10);
 		users[id] = { id, email, password };
-		console.log(users);
-		res.cookie('user_id', email);
+		// res.cookie('user_id', email);
+		req.session.user_id = email;
 		res.redirect('/urls');
 	}
-});
-
-app.get('/login', (req, res) => {
-	const templateVars = { user_id: req.cookies.user_id, error: false };
-	res.render('urls_login', templateVars);
 });
 
 app.post('/login', (req, res) => {
@@ -179,7 +220,8 @@ app.post('/login', (req, res) => {
 		const userURLDatabase = getUserURLDatabase(user_id);
 
 		let templateVars = { urls: userURLDatabase, user_id: user_id };
-		res.cookie('user_id', user_id);
+		// res.cookie('user_id', user_id);
+		req.session.user_id = user_id;
 		res.render('urls_index', templateVars);
 	}
 });
@@ -187,23 +229,9 @@ app.post('/login', (req, res) => {
 app.post('/urls/logout', (req, res) => {
 	// another way to clear cookie
 	// res.clearCookie('user_id');
-	res.cookie('user_id', '');
-
+	// res.cookie('user_id', '');
+	req.session = null;
 	res.redirect('/urls');
-});
-
-app.get('/urls/:shortURL', (req, res) => {
-	const user_id = req.cookies.user_id;
-	if (user_id) {
-		let templateVars = {
-			shortURL: req.params.shortURL,
-			longURL: urlDatabase[req.params.shortURL].longURL,
-			user_id: req.cookies.user_id,
-		};
-		res.render('urls_show', templateVars);
-	} else {
-		res.redirect('/urls');
-	}
 });
 
 app.post('/urls', (req, res) => {
@@ -211,13 +239,15 @@ app.post('/urls', (req, res) => {
 
 	urlDatabase[shortURL] = {
 		longURL: req.body.longURL,
-		userID: req.cookies.user_id,
+		userID: req.session.user_id,
+		// userID: req.cookies.user_id,
 	};
 	res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-	const user_id = req.cookies.user_id;
+	// const user_id = req.cookies.user_id;
+	const user_id = req.session.user_id;
 	if (user_id) {
 		const shortURL = req.params.shortURL;
 		delete urlDatabase[shortURL];
@@ -229,7 +259,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.post('/urls/:shortURL', (req, res) => {
 	// get the input from text input
-	const user_id = req.cookies.user_id;
+	// const user_id = req.cookies.user_id;
+	const user_id = req.session.user_id;
 	if (user_id) {
 		const longURL = req.body.newLongURLinputText;
 		urlDatabase[req.params.shortURL].longURL = longURL;
@@ -237,16 +268,6 @@ app.post('/urls/:shortURL', (req, res) => {
 		console.log('entry was updated');
 	}
 	res.redirect('/urls');
-});
-
-app.get('/u/:shortURL', (req, res) => {
-	const user_id = req.cookies.user_id;
-	if (user_id) {
-		const longURL = urlDatabase[req.params.shortURL].longURL;
-		res.redirect(longURL);
-	} else {
-		res.redirect('/urls');
-	}
 });
 
 app.listen(PORT, () => {
