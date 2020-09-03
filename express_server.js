@@ -12,15 +12,15 @@ const PORT = 8080;
 
 //======== MIDDLEWARE =======================
 // app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(
 	cookieSession({
 		name: 'session',
 		keys: ['secretkey'],
 	})
 );
-
+//============================================
 app.set('view engine', 'ejs');
 
 const users = {
@@ -273,3 +273,9 @@ app.post('/urls/:shortURL', (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}!`);
 });
+
+module.exports = {
+	doesEmailExist,
+	validatePassword,
+	getUserURLDatabase,
+};
