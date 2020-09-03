@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const alphanumeric = require('alphanumeric-id');
 const cookieSession = require('cookie-session');
 const uuid = require('uuid').v4;
@@ -10,6 +10,7 @@ const uuid = require('uuid').v4;
 const app = express();
 const PORT = 8080;
 
+//======== MIDDLEWARE =======================
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -20,12 +21,14 @@ const users = {
 	userRandomID: {
 		id: 'userRandomID',
 		email: 'user@example.com',
-		password: 'purple-monkey-dinosaur',
+		// password: 'purple-monkey-dinosaur',
+		password: '$2a$10$mRA0PJmaZUXtGuDmGeISg.f0LqvbbfAm1zRNRwFSFCk85FaULZhX6',
 	},
 	user2RandomID: {
 		id: 'user2RandomID',
 		email: 'user2@example.com',
-		password: 'dishwasher-funk',
+		// password: 'dishwasher-funk',
+		password: '$2a$10$drF4E9kLAsNW18wTmuGBtuTxmhb2ydfFuxyKMxJ7Qf1bo/psRMVPG',
 	},
 };
 
@@ -51,7 +54,7 @@ const generateRandomString = () => {
 	return alphanumeric(6);
 };
 
-const doesNewEmailExist = (newEmail) => {
+const doesEmailExist = (newEmail) => {
 	//return users[id][newEmail]
 	const emailDB = Object.keys(users).map((id) => users[id].email);
 	return emailDB.includes(newEmail);
@@ -59,7 +62,7 @@ const doesNewEmailExist = (newEmail) => {
 
 const validatePassword = (userEmail, userPassword) => {
 	for (const id in users) {
-		if (users[id].email === userEmail && users[id].password === userPassword) {
+		if (users[id].email === userEmail && bcrypt.compareSync(userPassword, users[id].password)) {
 			return true;
 		}
 	}
@@ -103,7 +106,7 @@ app.get('/register', (req, res) => {
 
 app.post('/register', (req, res) => {
 	const id = generateNewID(); // change to uuid --> require uuid.v4
-	const { email, password } = req.body;
+	let { email, password } = req.body;
 
 	// what happens if you try to register without an email or a password?
 	if (!email || !password) {
@@ -118,7 +121,7 @@ app.post('/register', (req, res) => {
 	}
 
 	// check if email already exist - error msg enter new email
-	else if (doesNewEmailExist(email)) {
+	else if (doesEmailExist(email)) {
 		const templateVars = {
 			user_id: '',
 			message: ERROR_MESSAGE.issue_with_email_password,
@@ -128,6 +131,7 @@ app.post('/register', (req, res) => {
 		res.status(400);
 		return res.render('urls_register', templateVars);
 	} else {
+		password = bcrypt.hashSync(password, 10);
 		users[id] = { id, email, password };
 		console.log(users);
 		res.cookie('user_id', email);
@@ -153,7 +157,7 @@ app.post('/login', (req, res) => {
 
 		res.status(403);
 		return res.render('urls_login', templateVars);
-	} else if (!doesNewEmailExist(email)) {
+	} else if (!doesEmailExist(email)) {
 		const templateVars = {
 			user_id: '',
 			message: ERROR_MESSAGE.account_does_not_exist,
@@ -161,7 +165,7 @@ app.post('/login', (req, res) => {
 		};
 		res.status(403);
 		return res.render('urls_login', templateVars);
-	} else if (doesNewEmailExist(email) && !validatePassword(email, password)) {
+	} else if (doesEmailExist(email) && !validatePassword(email, password)) {
 		const templateVars = {
 			user_id: '',
 			message: ERROR_MESSAGE.issue_with_email_password,
@@ -244,17 +248,6 @@ app.get('/u/:shortURL', (req, res) => {
 		res.redirect('/urls');
 	}
 });
-// app.get('/set', (req, res) => {
-// 	const a = 1;
-// 	res.send(`a = ${a}`);
-// });
-/* 
-a is not accessible in the other function/cb. The user will NOT see 'a' set to 1 in '/fetch/
-In fact, 'a' is not defined in this scope, and will result in a reference error when anyone visits that URL
-*/
-// app.get('/fetch', (req, res) => {
-// 	res.send(`a = ${a}`);
-// });
 
 app.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}!`);
