@@ -1,6 +1,6 @@
 const chai = require('chai');
 const assert = chai.assert;
-const { doesEmailExist, validatePassword, getUserURLDatabase } = require('../helpers');
+const { doesEmailExist, validateUserCredentials, getUserURLs } = require('../helpers');
 
 describe('#doesEmailExist()', () => {
 	it('should return a true when given existing valid email from user database', () => {
@@ -10,29 +10,29 @@ describe('#doesEmailExist()', () => {
 	});
 
 	it('should return a false when given non-existing email from user database', () => {
-		const actual = doesEmailExist('nonexisting@example.com');
+		const actual = doesEmailExist('nonExistingEmail@example.com');
 		const expectedOutput = false;
 		assert.equal(actual, expectedOutput);
 	});
 });
 
-describe('#validatePassword()', () => {
+describe('#validateUserCredentials()', () => {
 	it('should return a true when given valid password', () => {
-		const actual = validatePassword('user2@example.com', 'dishwasher-funk');
+		const actual = validateUserCredentials('user2@example.com', 'dishwasher-funk');
 		const expectedOutput = true;
 		assert.equal(actual, expectedOutput);
 	});
 
 	it('should return a false when given email and password are unmatched', () => {
-		const actual = validatePassword('user2@example.com', 'incorrectPassword');
+		const actual = validateUserCredentials('user2@example.com', 'incorrectPassword');
 		const expectedOutput = false;
 		assert.equal(actual, expectedOutput);
 	});
 });
 
-describe('#getUserURLDatabase()', () => {
+describe('#getUserURLs()', () => {
 	it('should return an expected url object when given a user', () => {
-		const actual = getUserURLDatabase('user@example.com');
+		const actual = getUserURLs('user@example.com');
 		const expectedOutput = {
 			b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'user@example.com' },
 			i3BoGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
@@ -40,4 +40,6 @@ describe('#getUserURLDatabase()', () => {
 		};
 		assert.deepEqual(actual, expectedOutput);
 	});
+
+	// test with invalid user
 });

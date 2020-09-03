@@ -67,7 +67,7 @@ const doesEmailExist = (newEmail) => {
 	return emailDB.includes(newEmail);
 };
 
-const validatePassword = (userEmail, userPassword) => {
+const validateUserCredentials = (userEmail, userPassword) => {
 	for (const id in users) {
 		if (users[id].email === userEmail && bcrypt.compareSync(userPassword, users[id].password)) {
 			return true;
@@ -76,7 +76,7 @@ const validatePassword = (userEmail, userPassword) => {
 	return false;
 };
 
-const getUserURLDatabase = (email) => {
+const getUserURLs = (email) => {
 	const userURLObj = {};
 	for (const url in urlDatabase) {
 		if (urlDatabase[url].userID === email) {
@@ -86,10 +86,14 @@ const getUserURLDatabase = (email) => {
 	return userURLObj;
 };
 //==============================================================================================
+app.get('/', (req, res) => {
+	res.redirect('/urls');
+});
+
 app.get('/urls', (req, res) => {
 	// const user_id = req.cookies.user_id;
 	const user_id = req.session.user_id;
-	const userURLDatabase = getUserURLDatabase(user_id);
+	const userURLDatabase = getUserURLs(user_id);
 
 	let templateVars = { urls: userURLDatabase, user_id: req.session.user_id };
 	res.render('urls_index', templateVars); // second argument takes on object
@@ -173,7 +177,6 @@ app.post('/register', (req, res) => {
 			message: ERROR_MESSAGE.issue_with_email_password,
 			error: true,
 		};
-
 		res.status(400);
 		return res.render('urls_register', templateVars);
 	} else {
@@ -206,7 +209,7 @@ app.post('/login', (req, res) => {
 		};
 		res.status(403);
 		return res.render('urls_login', templateVars);
-	} else if (doesEmailExist(email) && !validatePassword(email, password)) {
+	} else if (doesEmailExist(email) && !validateUserCredentials(email, password)) {
 		const templateVars = {
 			user_id: '',
 			message: ERROR_MESSAGE.issue_with_email_password,
@@ -217,7 +220,7 @@ app.post('/login', (req, res) => {
 		return res.render('urls_login', templateVars);
 	} else {
 		const user_id = email;
-		const userURLDatabase = getUserURLDatabase(user_id);
+		const userURLDatabase = getUserURLs(user_id);
 
 		let templateVars = { urls: userURLDatabase, user_id: user_id };
 		// res.cookie('user_id', user_id);
@@ -273,9 +276,3 @@ app.post('/urls/:shortURL', (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}!`);
 });
-
-module.exports = {
-	doesEmailExist,
-	validatePassword,
-	getUserURLDatabase,
-};

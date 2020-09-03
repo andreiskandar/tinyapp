@@ -45,7 +45,7 @@ const doesEmailExist = (newEmail) => {
 	return emailDB.includes(newEmail);
 };
 
-const validatePassword = (userEmail, userPassword) => {
+const validateUserCredentials = (userEmail, userPassword) => {
 	for (const id in users) {
 		if (users[id].email === userEmail && bcrypt.compareSync(userPassword, users[id].password)) {
 			return true;
@@ -54,7 +54,7 @@ const validatePassword = (userEmail, userPassword) => {
 	return false;
 };
 
-const getUserURLDatabase = (email) => {
+const getUserURLs = (email) => {
 	const userURLObj = {};
 	for (const url in urlDatabase) {
 		if (urlDatabase[url].userID === email) {
@@ -68,6 +68,6 @@ module.exports = {
 	generateNewID,
 	generateRandomString,
 	doesEmailExist,
-	validatePassword,
-	getUserURLDatabase,
+	validateUserCredentials,
+	getUserURLs,
 };
