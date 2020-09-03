@@ -34,8 +34,11 @@ const ERROR_MESSAGE = {
 };
 
 const urlDatabase = {
-	b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'aJ48lW' },
-	i3BoGr: { longURL: 'https://www.google.ca', userID: 'aJ48lW' },
+	b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'user@example.com' },
+	i3BoGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
+	pqWc5L: { longURL: 'https://www.bloomberg.com/canada', userID: 'user2@example.com' },
+	SHbJto: { longURL: 'https://ca.finance.yahoo.com/', userID: 'user2@example.com' },
+	i3BodsGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
 };
 
 const generateNewID = () => {
@@ -60,12 +63,17 @@ const validatePassword = (userEmail, userPassword) => {
 	return false;
 };
 
-app.get('/', (req, res) => {});
+const getUserURLDatabase = (email) => {};
 
 app.get('/urls', (req, res) => {
-	let templateVars = { urls: urlDatabase, user_id: req.cookies.user_id };
-
-	//res.render('fileName in views folder', {object})
+	const userURLDatabase = {};
+	const user_id = req.cookies.user_id;
+	for (const url in urlDatabase) {
+		if (urlDatabase[url].userID === user_id) {
+			userURLDatabase[url] = urlDatabase[url];
+		}
+	}
+	let templateVars = { urls: userURLDatabase, user_id: req.cookies.user_id };
 	res.render('urls_index', templateVars); // second argument takes on object
 });
 
@@ -165,8 +173,17 @@ app.post('/login', (req, res) => {
 		res.status(403);
 		return res.render('urls_login', templateVars);
 	} else {
+		const userURLDatabase = {};
+		const user_id = email;
+		for (const url in urlDatabase) {
+			if (urlDatabase[url].userID === user_id) {
+				userURLDatabase[url] = urlDatabase[url];
+			}
+		}
+		let templateVars = { urls: userURLDatabase, user_id: user_id };
 		res.cookie('user_id', email);
-		res.redirect('/urls');
+		res.render('urls_index', templateVars);
+		// res.redirect('/urls');
 	}
 });
 
