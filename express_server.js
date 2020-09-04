@@ -19,6 +19,7 @@ const PORT = 8080;
 //======== MIDDLEWARE =======================
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static('img'));
 app.use(methodOverride('_method'));
 app.use(
 	cookieSession({
@@ -38,7 +39,7 @@ app.get('/urls', (req, res) => {
 	const user_id = req.session.user_id;
 	const userURLDatabase = getUserURLs(user_id);
 
-	let templateVars = { urls: userURLDatabase, user_id: req.session.user_id };
+	const templateVars = { urls: userURLDatabase, user_id: req.session.user_id };
 	res.render('urls_index', templateVars);
 });
 
