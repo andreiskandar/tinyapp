@@ -178,7 +178,6 @@ app.post('/urls', (req, res) => {
 });
 
 app.delete('/urls/:shortURL/delete', (req, res) => {
-	// app.post('/urls/:shortURL/delete', (req, res) => {
 	const user_id = req.session.user_id;
 	if (user_id) {
 		const shortURL = req.params.shortURL;
