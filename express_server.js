@@ -4,7 +4,6 @@ const methodOverride = require('method-override');
 const bcrypt = require('bcrypt');
 const ERROR_MESSAGE = require('./constants');
 const { users, urlDatabase } = require('./sampleDatabase');
-const bcrypt = require('bcrypt');
 
 const {
 	generateNewID,
