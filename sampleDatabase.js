@@ -18,7 +18,7 @@ const urlDatabase = {
 	i3BoGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
 	pqWc5L: { longURL: 'https://www.bloomberg.com/canada', userID: 'user2@example.com' },
 	SHbJto: { longURL: 'https://ca.finance.yahoo.com/', userID: 'user2@example.com' },
-	i3BodsGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
+	i3BsGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
 };
 
 module.exports = { users, urlDatabase };

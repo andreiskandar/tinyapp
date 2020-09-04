@@ -36,7 +36,7 @@ describe('#getUserURLs()', () => {
 		const expectedOutput = {
 			b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'user@example.com' },
 			i3BoGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
-			i3Bfsr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
+			i3BsGr: { longURL: 'https://www.google.ca', userID: 'user@example.com' },
 		};
 		assert.deepEqual(actual, expectedOutput);
 	});
