@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
 const methodOverride = require('method-override');
+const bcrypt = require('bcrypt');
 const ERROR_MESSAGE = require('./constants');
 const { users, urlDatabase } = require('./sampleDatabase');
 
