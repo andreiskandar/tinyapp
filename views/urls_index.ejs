@@ -19,7 +19,6 @@
 			<% if(!user_id) {%>
 			<div class="card text-center">
 				<div class="card-header">
-					<!-- <img src="../img/logo.JPG" alt="TinyApp Logo" /> -->
 					<h3>TinyApp</h3>
 				</div>
 				<div class="card-body">
@@ -72,7 +71,7 @@
 							<a href="/urls/<%= url %>" class="btn btn-outline-primary">Edit</a>
 						</td>
 						<td>
-							<form method="POST" action="/urls/<%= url %>/delete">
+							<form method="POST" action="/urls/<%= url %>/delete/?_method=DELETE">
 								<button class="btn btn-outline-danger" style="margin-right: 50px">Delete</button>
 							</form>
 						</td>

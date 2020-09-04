@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 const ERROR_MESSAGE = require('./constants');
 const { users, urlDatabase } = require('./sampleDatabase');
 
@@ -17,6 +18,7 @@ const PORT = 8080;
 //======== MIDDLEWARE =======================
 
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride('_method'));
 app.use(
 	cookieSession({
 		name: 'session',
@@ -175,7 +177,8 @@ app.post('/urls', (req, res) => {
 	res.redirect('/urls');
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL/delete', (req, res) => {
+	// app.post('/urls/:shortURL/delete', (req, res) => {
 	const user_id = req.session.user_id;
 	if (user_id) {
 		const shortURL = req.params.shortURL;
@@ -185,7 +188,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 	res.redirect('/urls');
 });
 
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
 	const user_id = req.session.user_id;
 	if (user_id) {
 		const longURL = req.body.newLongURLinputText;
