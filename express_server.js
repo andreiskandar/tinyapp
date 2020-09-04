@@ -4,6 +4,7 @@ const methodOverride = require('method-override');
 const bcrypt = require('bcrypt');
 const ERROR_MESSAGE = require('./constants');
 const { users, urlDatabase } = require('./sampleDatabase');
+const bcrypt = require('bcrypt');
 
 const {
 	generateNewID,
@@ -169,12 +170,14 @@ app.post('/urls/logout', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
-	const shortURL = generateRandomString();
-
-	urlDatabase[shortURL] = {
-		longURL: req.body.longURL,
-		userID: req.session.user_id,
-	};
+	const user_id = req.session.user_id;
+	if (user_id) {
+		const shortURL = generateRandomString();
+		urlDatabase[shortURL] = {
+			longURL: req.body.longURL,
+			userID: req.session.user_id,
+		};
+	}
 	res.redirect('/urls');
 });
 
