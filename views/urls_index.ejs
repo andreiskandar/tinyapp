@@ -58,6 +58,7 @@
 					<tr>
 						<th scope="col">Short URL</th>
 						<th scope="col">Long URL</th>
+						<th scope="col">Created</th>
 						<th style="padding-left: 23px" scope="col">Edit</th>
 						<th style="padding-left: 23px" scope="col">Delete</th>
 					</tr>
@@ -65,8 +66,9 @@
 				<tbody>
 					<% for(let url in urls) { %>
 					<tr>
-						<td><a href="<%= urls[url].longURL %>"><%= url %></a></td>
+						<td><a href="/urls/<%= url %>"><%= url %></a></td>
 						<td><a href="<%= urls[url].longURL %>"><%= urls[url].longURL %></a></td>
+						<td style="font-size: 0.7em mt-3"><%= urls[url].timestamp %></td>
 						<td>
 							<a href="/urls/<%= url %>" class="btn btn-outline-primary">Edit</a>
 						</td>

@@ -1,4 +1,5 @@
 const express = require('express');
+const moment = require('moment-timezone');
 const cookieSession = require('cookie-session');
 const methodOverride = require('method-override');
 const bcrypt = require('bcrypt');
@@ -7,6 +8,7 @@ const { users, urlDatabase } = require('./sampleDatabase');
 
 const {
 	generateNewID,
+	getTimestamp,
 	generateRandomString,
 	doesEmailExist,
 	validateUserCredentials,
@@ -37,14 +39,19 @@ app.get('/', (req, res) => {
 
 app.get('/urls', (req, res) => {
 	const user_id = req.session.user_id;
+
 	const userURLDatabase = getUserURLs(user_id);
 
-	const templateVars = { urls: userURLDatabase, user_id: req.session.user_id };
+	const templateVars = {
+		urls: userURLDatabase,
+		user_id: req.session.user_id,
+	};
 	res.render('urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
 	let templateVars = { user_id: req.session.user_id };
+
 	if (!req.session.user_id) {
 		res.redirect('/login');
 	} else {
@@ -171,12 +178,15 @@ app.post('/urls/logout', (req, res) => {
 
 app.post('/urls', (req, res) => {
 	const user_id = req.session.user_id;
+	const now = moment().tz('US/Pacific').format('YY/MM/DD ddd HH:mm z');
 	if (user_id) {
 		const shortURL = generateRandomString();
 		urlDatabase[shortURL] = {
 			longURL: req.body.longURL,
 			userID: req.session.user_id,
+			timestamp: now,
 		};
+		console.log(urlDatabase);
 	}
 	res.redirect('/urls');
 });
@@ -186,7 +196,6 @@ app.delete('/urls/:shortURL/delete', (req, res) => {
 	if (user_id) {
 		const shortURL = req.params.shortURL;
 		delete urlDatabase[shortURL];
-		console.log('entry was deleted');
 	}
 	res.redirect('/urls');
 });
@@ -196,7 +205,6 @@ app.put('/urls/:shortURL', (req, res) => {
 	if (user_id) {
 		const longURL = req.body.newLongURLinputText;
 		urlDatabase[req.params.shortURL].longURL = longURL;
-		console.log('entry was updated');
 	}
 	res.redirect('/urls');
 });
@@ -204,7 +212,3 @@ app.put('/urls/:shortURL', (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}!`);
 });
-
-
-
-

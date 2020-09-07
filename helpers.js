@@ -25,6 +25,16 @@ const validateUserCredentials = (userEmail, userPassword) => {
 	return false;
 };
 
+const getTimestamp = (email) => {
+	let timestamp;
+	for (const url in urlDatabase) {
+		if (urlDatabase[url].userID === email) {
+			timestamp = urlDatabase[url].timestamp;
+		}
+	}
+	return timestamp;
+};
+
 const getUserURLs = (email) => {
 	const userURLObj = {};
 	for (const url in urlDatabase) {
@@ -36,6 +46,7 @@ const getUserURLs = (email) => {
 };
 
 module.exports = {
+	getTimestamp,
 	generateNewID,
 	getUserURLs,
 	generateRandomString,
