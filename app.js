@@ -209,6 +209,4 @@ app.put('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}!`);
-});
+module.exports = app;
