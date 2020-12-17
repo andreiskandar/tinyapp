@@ -16,6 +16,7 @@ describe('Test /urls path', () => {
     return request(app)
       .get('/urls')
       .then((res) => {
+        console.log('res body message', res.body.message);
         expect(res.statusCode).toBe(200);
       });
   });

@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "./node_modules/.bin/nodemon -L express_server.js",
 		"test-with-mocha": "./node_modules/mocha/bin/mocha",
-		"test": "jest"
+		"test": "jest",
+		"test:watch": "jest --watch"
 	},
 	"repository": {
 		"type": "git",
