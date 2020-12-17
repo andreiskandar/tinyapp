@@ -16,7 +16,6 @@ const {
 } = require('./helpers/helpers');
 
 const app = express();
-const PORT = 8080;
 
 //======== MIDDLEWARE =======================
 
